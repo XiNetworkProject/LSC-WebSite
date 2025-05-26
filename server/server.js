@@ -22,12 +22,6 @@ const db = new sqlite3.Database('./database.sqlite', (err) => {
   }
 });
 
-// Import dynamique de node-fetch
-let fetch;
-(async () => {
-  fetch = (await import('node-fetch')).default;
-})();
-
 const RECAPTCHA_SECRET = '6Le5JkUrAAAAAPUTbm2QtQKWwbPW7r0Us7us51qu'; // À remplacer par la vraie clé secrète
 
 // Mot de passe admin (à personnaliser si besoin)
