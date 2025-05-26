@@ -6,6 +6,7 @@ services:
       cd server && npm install
       cp -r * ..
       cp package.json ..
+      cd .. && npm install
     startCommand: node server.js
     envVars:
       - key: NODE_ENV
