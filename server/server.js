@@ -1,9 +1,9 @@
-import express from 'express';
-import cors from 'cors';
-import sqlite3 from 'sqlite3';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import fetch from 'node-fetch';
+const express = require('express');
+const cors = require('cors');
+const sqlite3 = require('sqlite3').verbose();
+const { fileURLToPath } = require('url');
+const { dirname } = require('path');
+const fetch = require('node-fetch');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
