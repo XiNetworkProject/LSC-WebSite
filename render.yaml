@@ -1,11 +1,13 @@
 services:
   - type: web
     name: lsc-website
-    env: node
-    buildCommand: cd server && npm install
-    startCommand: cd server && node server.js
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server/server.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 10000 
+        value: 10000
+      - key: ADMIN_PASSWORD
+        value: admin 
