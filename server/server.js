@@ -1,12 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
-const { fileURLToPath } = require('url');
-const { dirname } = require('path');
 const fetch = require('node-fetch');
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const app = express();
 app.use(express.json());
