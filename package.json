@@ -4,8 +4,7 @@
   "description": "Site web LSC",
   "main": "server/server.js",
   "scripts": {
-    "start": "node server/server.js",
-    "install": "npm install"
+    "start": "node server/server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
