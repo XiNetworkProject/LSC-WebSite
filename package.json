@@ -2,9 +2,9 @@
   "name": "lsc-website",
   "version": "1.0.0",
   "description": "Site web LSC",
-  "main": "server/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "cd server && node server.js",
+    "start": "node server.js",
     "install": "cd server && npm install"
   },
   "dependencies": {
