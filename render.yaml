@@ -2,12 +2,8 @@ services:
   - type: web
     name: lsc-website
     runtime: node
-    buildCommand: |
-      cd server && npm install
-      cp -r * ..
-      cp package.json ..
-      cd .. && npm install
-    startCommand: node server.js
+    buildCommand: npm install
+    startCommand: node server/server.js
     envVars:
       - key: NODE_ENV
         value: production
