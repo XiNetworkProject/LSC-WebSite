@@ -1,0 +1,15 @@
+{
+  "short_name": "LSC",
+  "name": "LSC Jeux Concours",
+  "icons": [
+    {
+      "src": "logo-saint-claude.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

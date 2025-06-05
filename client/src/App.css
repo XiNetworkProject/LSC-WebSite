@@ -1,0 +1,339 @@
+:root {
+  --orange: #ffb86b;
+  --orange2: #ff9e3d;
+  --beige: #fff6e9;
+  --blanc: #fff;
+  --gris: #232323;
+  --gris2: #444;
+  --gris3: #888;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--beige);
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 60% 20%, var(--orange) 0%, var(--beige) 60%, var(--blanc) 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.animated-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.animated-bg .halo {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,184,107,0.18) 0%, rgba(255,184,107,0) 80%);
+  pointer-events: none;
+  animation: haloMove 14s linear infinite alternate;
+}
+.animated-bg .halo1 {
+  width: 420px; height: 420px; left: 8vw; top: 12vh;
+  animation-delay: 0s;
+}
+.animated-bg .halo2 {
+  width: 320px; height: 320px; right: 10vw; top: 32vh;
+  animation-delay: 2s;
+}
+.animated-bg .halo3 {
+  width: 260px; height: 260px; left: 45vw; bottom: 8vh;
+  animation-delay: 4s;
+}
+@keyframes haloMove {
+  0% { transform: scale(1) translateY(0); opacity: 0.7; }
+  100% { transform: scale(1.12) translateY(40px); opacity: 1; }
+}
+
+/* Particules bokeh */
+.animated-bg .bokeh {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.13);
+  box-shadow: 0 0 32px 8px rgba(255,184,107,0.08);
+  pointer-events: none;
+  animation: bokehMove 18s linear infinite alternate;
+}
+.animated-bg .b1 { width: 60px; height: 60px; left: 20vw; top: 60vh; animation-delay: 0s; }
+.animated-bg .b2 { width: 40px; height: 40px; left: 70vw; top: 20vh; animation-delay: 3s; }
+.animated-bg .b3 { width: 30px; height: 30px; left: 50vw; top: 80vh; animation-delay: 7s; }
+.animated-bg .b4 { width: 50px; height: 50px; left: 80vw; top: 60vh; animation-delay: 10s; }
+.animated-bg .b5 { width: 35px; height: 35px; left: 10vw; top: 30vh; animation-delay: 13s; }
+@keyframes bokehMove {
+  0% { transform: scale(1) translateY(0); opacity: 0.7; }
+  100% { transform: scale(1.2) translateY(-30px); opacity: 1; }
+}
+
+.main-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+.navbar {
+  display: flex;
+  gap: 2rem;
+  background: var(--blanc);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  align-items: center;
+  position: relative;
+  z-index: 10;
+  backdrop-filter: blur(8px) saturate(1.2);
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 8px 32px 0 rgba(255,184,107,0.12), 0 1.5px 8px 0 rgba(0,0,0,0.07);
+}
+
+.navbar a {
+  color: var(--gris);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: color 0.2s, background 0.2s;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+.navbar a:hover, .navbar a.active {
+  color: var(--blanc);
+  background: var(--orange2);
+}
+
+.burger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  margin-left: auto;
+}
+.burger span {
+  height: 3px;
+  width: 28px;
+  background: var(--orange2);
+  margin: 4px 0;
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+@media (max-width: 800px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 1rem;
+  }
+  .navbar .links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background: var(--blanc);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: absolute;
+    top: 60px;
+    left: 0;
+    z-index: 9;
+  }
+  .navbar .links.open {
+    display: flex;
+  }
+  .burger {
+    display: flex;
+  }
+}
+
+.content {
+  max-width: 800px;
+  width: 95vw;
+  margin: 2rem auto;
+  background: rgba(255,255,255,0.97);
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  padding: 2rem 1rem;
+  backdrop-filter: blur(8px) saturate(1.2);
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 8px 32px 0 rgba(255,184,107,0.12), 0 1.5px 8px 0 rgba(0,0,0,0.07);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.content.fadeIn {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.content.fadeOut {
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+}
+
+/* Supprimer les anciennes classes de transition */
+.fade-enter,
+.fade-enter-active,
+.fade-exit,
+.fade-exit-active {
+  display: none;
+}
+
+.accueil, .jeux-concours, .bar-tabac, .infos-pratiques, .admin {
+  text-align: center;
+}
+
+h1, h2, h3, h4 {
+  color: var(--orange2);
+  margin-bottom: 1rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  letter-spacing: 1px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 0.5rem;
+  color: var(--gris2);
+}
+
+button {
+  background: var(--orange2);
+  color: var(--blanc);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255,184,107,0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+button:hover, button:focus {
+  background: var(--gris);
+  color: var(--orange2);
+  box-shadow: 0 4px 16px rgba(255,184,107,0.15);
+}
+
+input, textarea {
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 1rem;
+  width: 100%;
+  margin-top: 4px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  color: var(--gris2);
+}
+input:focus, textarea:focus {
+  outline: 2px solid var(--orange2);
+  border-color: var(--orange2);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: var(--beige);
+}
+::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 8px;
+}
+
+.jeu-carte {
+  transition: transform 0.22s cubic-bezier(.4,2,.3,1), box-shadow 0.22s;
+  position: relative;
+  overflow: hidden;
+}
+.jeu-carte:hover {
+  transform: scale(1.035) translateY(-6px);
+  box-shadow: 0 16px 48px 0 rgba(255,184,107,0.18), 0 4px 16px 0 rgba(0,0,0,0.10);
+  z-index: 2;
+}
+.jeu-carte-banniere::after {
+  content: '';
+  position: absolute; left:0; top:0; right:0; bottom:0;
+  background: linear-gradient(120deg, rgba(255,184,107,0.18) 0%, rgba(0,0,0,0.18) 100%);
+  pointer-events: none;
+}
+
+.jeu-carte-content {
+  position: relative;
+  z-index: 2;
+}
+
+.jeu-carte-btn, button {
+  background: linear-gradient(90deg, var(--orange2), var(--orange));
+  color: var(--blanc);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(255,184,107,0.13);
+  transition: background 0.18s, box-shadow 0.18s, transform 0.13s;
+  position: relative;
+  overflow: hidden;
+}
+.jeu-carte-btn:hover, button:hover {
+  background: linear-gradient(90deg, var(--orange), var(--orange2));
+  color: var(--gris);
+  box-shadow: 0 6px 24px rgba(255,184,107,0.18);
+  transform: scale(1.04);
+}
+
+/* Ripple effect on button click */
+.jeu-carte-btn:active::after, button:active::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 120%; height: 120%;
+  background: rgba(255,255,255,0.18);
+  border-radius: 50%;
+  transform: translate(-50%,-50%) scale(0.7);
+  animation: ripple 0.4s linear;
+  pointer-events: none;
+}
+@keyframes ripple {
+  0% { opacity: 1; transform: translate(-50%,-50%) scale(0.7); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(1.2); }
+}
+
+/* Loader et toast */
+.loader {
+  position: fixed;
+  left: 50%; top: 50%; transform: translate(-50%,-50%);
+  z-index: 1000;
+  width: 64px; height: 64px;
+  border: 6px solid #ffb86b;
+  border-top: 6px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  background: rgba(255,255,255,0.7);
+}
+@keyframes spin {
+  0% { transform: translate(-50%,-50%) rotate(0deg); }
+  100% { transform: translate(-50%,-50%) rotate(360deg); }
+}
+.toast {
+  position: fixed;
+  bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+  background: var(--orange2);
+  color: var(--blanc);
+  padding: 1rem 2rem;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 24px rgba(255,184,107,0.18);
+  z-index: 2000;
+  opacity: 0.98;
+  animation: toastIn 0.5s cubic-bezier(.4,2,.3,1);
+}
+@keyframes toastIn {
+  0% { opacity: 0; transform: translateX(-50%) translateY(40px); }
+  100% { opacity: 0.98; transform: translateX(-50%) translateY(0); }
+}
