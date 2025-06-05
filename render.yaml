@@ -2,7 +2,10 @@ services:
   - type: web
     name: lsc-website
     runtime: node
-    buildCommand: npm install
+    plan: free
+    buildCommand: |
+      npm install
+      cd client && npm install && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -11,5 +14,11 @@ services:
         value: 10000
       - key: ADMIN_PASSWORD
         value: admin
+      - key: DATABASE_URL
+        value: ./database.sqlite
     healthCheckPath: /
-    autoDeploy: true 
+    autoDeploy: true
+    disk:
+      name: sqlite-data
+      mountPath: /opt/render/project/src/server
+      sizeGB: 1 
