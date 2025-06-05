@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faUserShield, faChartBar, faGift, faUsers, faVenusMars, faBirthdayCake } from '@fortawesome/free-solid-svg-icons';
+import config from '../config';
 
 function Admin() {
   const [password, setPassword] = useState('');
@@ -50,7 +51,7 @@ function Admin() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
-    fetch('http://localhost:5000/api/admin/login', {
+    fetch(`${config.apiUrl}/api/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password })
@@ -73,7 +74,7 @@ function Admin() {
   const fetchJeux = (pwd) => {
     const pass = pwd || adminPassword;
     setLoadingJeux(true);
-    fetch('http://localhost:5000/api/admin/jeux/list', {
+    fetch(`${config.apiUrl}/api/admin/jeux/list`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: pass })
@@ -96,7 +97,7 @@ function Admin() {
       setAddError('Le titre est obligatoire');
       return;
     }
-    fetch('http://localhost:5000/api/admin/jeux', {
+    fetch(`${config.apiUrl}/api/admin/jeux`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...addForm, password: adminPassword })
@@ -118,7 +119,7 @@ function Admin() {
   const handleShowParticipants = (jeu_id) => {
     setParticipantsLoading(true);
     setShowParticipantsJeuId(jeu_id);
-    fetch('http://localhost:5000/api/admin/participants', {
+    fetch(`${config.apiUrl}/api/admin/participants`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ jeu_id, password: adminPassword })
@@ -138,7 +139,7 @@ function Admin() {
   // Supprimer un jeu concours
   const handleDeleteJeu = (id) => {
     if (!window.confirm('Supprimer ce jeu ?')) return;
-    fetch('http://localhost:5000/api/admin/jeux/delete', {
+    fetch(`${config.apiUrl}/api/admin/jeux/delete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, password: adminPassword })
@@ -175,7 +176,7 @@ function Admin() {
       setEditError('Le titre est obligatoire');
       return;
     }
-    fetch('http://localhost:5000/api/admin/jeux/edit', {
+    fetch(`${config.apiUrl}/api/admin/jeux/edit`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...editForm, password: adminPassword })
@@ -265,7 +266,7 @@ function Admin() {
   };
 
   const refreshStats = () => {
-    fetch('http://localhost:5000/api/admin/stats', {
+    fetch(`${config.apiUrl}/api/admin/stats`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: adminPassword })
@@ -290,7 +291,7 @@ function Admin() {
   useEffect(() => {
     if (isLogged && adminPassword) {
       fetchJeux(adminPassword);
-      fetch('http://localhost:5000/api/admin/stats', {
+      fetch(`${config.apiUrl}/api/admin/stats`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: adminPassword })

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrophy, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import config from '../config';
 
 function JeuxConcours() {
   const [jeux, setJeux] = useState([]);
@@ -26,7 +27,7 @@ function JeuxConcours() {
 
   useEffect(() => {
     setLoading(true);
-    fetch('http://localhost:5000/api/jeux')
+    fetch(`${config.apiUrl}/api/jeux`)
       .then(res => res.json())
       .then(data => {
         setJeux(data);
@@ -98,7 +99,7 @@ function JeuxConcours() {
       return;
     }
     setSending(true);
-    fetch('http://localhost:5000/api/participer', {
+    fetch(`${config.apiUrl}/api/participer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...formData, jeu_id: formJeuId })

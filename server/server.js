@@ -13,10 +13,12 @@ app.use(express.json());
 
 // Configuration CORS plus permissive
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://lsc-website.onrender.com'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  origin: true, // Autorise toutes les origines en développement
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  credentials: true,
+  maxAge: 86400 // Cache les préférences CORS pendant 24 heures
 }));
 
 // Servir les fichiers statiques du client
