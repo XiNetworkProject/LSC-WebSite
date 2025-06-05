@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 // Remplacer l'importation de fetch par une fonction asynchrone
 let fetch;
 (async () => {
@@ -17,6 +18,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+
+// Servir les fichiers statiques du client
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 const db = new sqlite3.Database('./database.sqlite', (err) => {
   if (err) {
@@ -378,6 +382,11 @@ app.post('/api/verify-recaptcha', async (req, res) => {
     console.error('Erreur de vérification reCAPTCHA:', error);
     res.status(500).json({ success: false, error: 'Erreur de vérification reCAPTCHA' });
   }
+});
+
+// Route par défaut pour servir l'application React
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 // Démarrage du serveur

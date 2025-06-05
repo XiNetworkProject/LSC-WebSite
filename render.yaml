@@ -2,15 +2,14 @@ services:
   - type: web
     name: lsc-website
     runtime: node
-    buildCommand: |
-      rm -rf node_modules
-      npm cache clean --force
-      npm install
-    startCommand: node server/server.js
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
       - key: ADMIN_PASSWORD
-        value: admin 
+        value: admin
+    healthCheckPath: /
+    autoDeploy: true 
