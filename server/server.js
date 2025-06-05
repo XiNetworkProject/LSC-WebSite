@@ -249,7 +249,7 @@ app.get('/api/stats', (req, res) => {
 
 app.post('/api/admin/stats', (req, res) => {
   const { password } = req.body;
-  if (password !== ADMIN_PASSWORD && password !== 'admin') {
+  if (password !== ADMIN_PASSWORD) {
     return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
   }
   db.all('SELECT * FROM participants', [], (err, participants) => {
