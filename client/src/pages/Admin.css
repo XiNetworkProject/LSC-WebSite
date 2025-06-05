@@ -403,6 +403,244 @@
   font-weight: 500;
 }
 
+/* Styles pour le tableau de bord */
+.gender-stats {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.gender-male, .gender-female {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.gender-male {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.gender-female {
+  background-color: #fce4ec;
+  color: #c2185b;
+}
+
+.participation-chart {
+  display: flex;
+  gap: 1rem;
+  height: 200px;
+  padding: 1rem;
+  align-items: flex-end;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.participation-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-width: 60px;
+}
+
+.bar-fill {
+  width: 100%;
+  background: #3498db;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.3s ease;
+}
+
+.bar-label {
+  position: absolute;
+  bottom: -25px;
+  font-size: 0.8rem;
+  color: #666;
+  transform: rotate(-45deg);
+  transform-origin: top left;
+  white-space: nowrap;
+}
+
+.bar-value {
+  position: absolute;
+  top: -25px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+/* Styles pour le formulaire de jeu */
+.form-container {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.75rem;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.lot-input {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr auto;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.remove-lot-button {
+  padding: 0.5rem;
+  background: #fee;
+  color: #c00;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-lot-button {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #e3f2fd;
+  color: #1976d2;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.submit-button {
+  padding: 0.75rem 1.5rem;
+  background: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.cancel-button {
+  padding: 0.75rem 1.5rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Styles pour les cartes de jeux */
+.jeu-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.jeu-info {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.jeu-description {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.jeu-lots {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.jeu-lots h4 {
+  margin: 0 0 0.5rem;
+  color: #2c3e50;
+}
+
+.jeu-lots ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jeu-lots li {
+  padding: 0.25rem 0;
+  color: #666;
+}
+
+.jeu-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.edit-button {
+  padding: 0.5rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Styles pour le tableau des participants */
+.gender-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.gender-badge.male {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.gender-badge.female {
+  background: #fce4ec;
+  color: #c2185b;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .admin-container {
@@ -426,6 +664,27 @@
   
   .jeux-grid {
     grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .lot-input {
+    grid-template-columns: 1fr;
+  }
+
+  .jeu-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .participation-chart {
+    overflow-x: auto;
+    padding-bottom: 2rem;
+  }
+
+  .participation-bar {
+    min-width: 40px;
   }
 }
 
