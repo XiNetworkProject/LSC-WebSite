@@ -35,7 +35,11 @@ const db = new sqlite3.Database('./database.sqlite', (err) => {
 const RECAPTCHA_SECRET = '6Le5JkUrAAAAAPUTbm2QtQKWwbPW7r0Us7us51qu'; // À remplacer par la vraie clé secrète
 
 // Mot de passe admin (à personnaliser si besoin)
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+if (!ADMIN_PASSWORD) {
+  console.error('ERREUR: ADMIN_PASSWORD n\'est pas défini dans les variables d\'environnement');
+  process.exit(1);
+}
 
 // Schéma de la table jeux
 db.run(`CREATE TABLE IF NOT EXISTS jeux (
@@ -245,7 +249,7 @@ app.get('/api/stats', (req, res) => {
 
 app.post('/api/admin/stats', (req, res) => {
   const { password } = req.body;
-  if (password !== process.env.ADMIN_PASSWORD && password !== 'admin') {
+  if (password !== ADMIN_PASSWORD && password !== 'admin') {
     return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
   }
   db.all('SELECT * FROM participants', [], (err, participants) => {
@@ -307,7 +311,9 @@ app.post('/api/admin/login', (req, res) => {
 // Liste des jeux (admin)
 app.post('/api/admin/jeux/list', (req, res) => {
   const { password } = req.body;
-  if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
+  }
   db.all('SELECT * FROM jeux ORDER BY date_debut DESC', [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     const jeux = rows.map(jeu => ({ ...jeu, lots: JSON.parse(jeu.lots || '[]') }));
@@ -318,7 +324,9 @@ app.post('/api/admin/jeux/list', (req, res) => {
 // Ajouter un jeu (admin)
 app.post('/api/admin/jeux', (req, res) => {
   const { password, titre, description, date_debut, date_fin, banniere, age_minimum, lots } = req.body;
-  if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
+  }
   const lotsJson = JSON.stringify(lots || []);
   db.run(
     'INSERT INTO jeux (titre, description, date_debut, date_fin, banniere, age_minimum, lots) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -333,7 +341,9 @@ app.post('/api/admin/jeux', (req, res) => {
 // Modifier un jeu (admin)
 app.post('/api/admin/jeux/edit', (req, res) => {
   const { password, id, titre, description, date_debut, date_fin, banniere, age_minimum, lots } = req.body;
-  if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
+  }
   const lotsJson = JSON.stringify(lots || []);
   db.run(
     'UPDATE jeux SET titre = ?, description = ?, date_debut = ?, date_fin = ?, banniere = ?, age_minimum = ?, lots = ? WHERE id = ?',
@@ -345,23 +355,60 @@ app.post('/api/admin/jeux/edit', (req, res) => {
   );
 });
 
-// Supprimer un jeu (admin)
-app.post('/api/admin/jeux/delete', (req, res) => {
-  const { password, id } = req.body;
-  if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
-  db.run('DELETE FROM jeux WHERE id = ?', [id], function(err) {
+// Liste des participants d'un jeu (admin)
+app.post('/api/admin/participants', (req, res) => {
+  const { password, jeu_id, searchTerm } = req.body;
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
+  }
+  
+  let query = 'SELECT * FROM participants WHERE jeu_id = ?';
+  let params = [jeu_id];
+  
+  // Ajout de la recherche par nom/prénom si searchTerm est fourni
+  if (searchTerm && searchTerm.trim()) {
+    query += ' AND (nom LIKE ? OR prenom LIKE ?)';
+    const searchPattern = `%${searchTerm.trim()}%`;
+    params.push(searchPattern, searchPattern);
+  }
+  
+  query += ' ORDER BY date_participation DESC';
+  
+  db.all(query, params, (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
+// Supprimer un participant (admin)
+app.post('/api/admin/participants/delete', (req, res) => {
+  const { password, participant_id } = req.body;
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
+  }
+  
+  db.run('DELETE FROM participants WHERE id = ?', [participant_id], function(err) {
     if (err) return res.status(500).json({ success: false, error: err.message });
     res.json({ success: true });
   });
 });
 
-// Liste des participants d'un jeu (admin)
-app.post('/api/admin/participants', (req, res) => {
-  const { password, jeu_id } = req.body;
-  if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
-  db.all('SELECT * FROM participants WHERE jeu_id = ? ORDER BY date_participation DESC', [jeu_id], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+// Supprimer un jeu (admin)
+app.post('/api/admin/jeux/delete', (req, res) => {
+  const { password, id } = req.body;
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
+  }
+  
+  // Supprimer d'abord tous les participants associés au jeu
+  db.run('DELETE FROM participants WHERE jeu_id = ?', [id], function(err) {
+    if (err) return res.status(500).json({ success: false, error: err.message });
+    
+    // Ensuite supprimer le jeu
+    db.run('DELETE FROM jeux WHERE id = ?', [id], function(err) {
+      if (err) return res.status(500).json({ success: false, error: err.message });
+      res.json({ success: true });
+    });
   });
 });
 

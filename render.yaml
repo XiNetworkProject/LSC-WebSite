@@ -13,7 +13,7 @@ services:
       - key: PORT
         value: 10000
       - key: ADMIN_PASSWORD
-        value: admin
+        value: saintclaude2024
       - key: DATABASE_URL
         value: ./database.sqlite
     healthCheckPath: /

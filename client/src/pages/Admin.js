@@ -6,9 +6,9 @@ import './Admin.css';
 
 function Admin() {
   const [password, setPassword] = useState('');
-  const [adminPassword, setAdminPassword] = useState('');
   const [isLogged, setIsLogged] = useState(false);
   const [error, setError] = useState('');
+  const [sessionPassword, setSessionPassword] = useState('');
   const [jeux, setJeux] = useState([]);
   const [loadingJeux, setLoadingJeux] = useState(false);
   const [addForm, setAddForm] = useState({ 
@@ -66,7 +66,7 @@ function Admin() {
       .then(data => {
         if (data.success) {
           setIsLogged(true);
-          setAdminPassword(password); // On mémorise le mot de passe admin
+          setSessionPassword(password);
           setPassword('');
           fetchJeux(password);
         } else {
@@ -78,18 +78,18 @@ function Admin() {
 
   // Récupérer les jeux concours
   const fetchJeux = (pwd) => {
-    const pass = pwd || adminPassword;
+    const currentPassword = pwd || sessionPassword;
     setLoadingJeux(true);
     fetch(`${config.apiUrl}/api/admin/jeux/list`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pass })
+      body: JSON.stringify({ password: currentPassword })
     })
       .then(res => res.json())
       .then(data => {
         setJeux(Array.isArray(data) ? data : []);
         setLoadingJeux(false);
-        refreshStats();
+        refreshStats(currentPassword);
       })
       .catch(() => setLoadingJeux(false));
   };
@@ -106,14 +106,14 @@ function Admin() {
     fetch(`${config.apiUrl}/api/admin/jeux`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...addForm, password: adminPassword })
+      body: JSON.stringify({ ...addForm, password: password })
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           setAddSuccess('Jeu ajouté !');
           setAddForm({ titre: '', description: '', date_debut: '', date_fin: '', banniere: '', lots: [{ rang: 1, description: '', valeur: '' }], age_minimum: 18 });
-          fetchJeux(adminPassword);
+          fetchJeux(password);
         } else {
           setAddError(data.error || 'Erreur lors de l\'ajout');
         }
@@ -135,7 +135,7 @@ function Admin() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         jeu_id, 
-        password: adminPassword,
+        password: sessionPassword,
         searchTerm: searchTerm.trim()
       })
     })
@@ -143,7 +143,7 @@ function Admin() {
       .then(data => {
         setParticipants(Array.isArray(data) ? data : []);
         setParticipantsLoading(false);
-        refreshStats();
+        refreshStats(sessionPassword);
       })
       .catch(() => {
         setParticipants([]);
@@ -159,13 +159,13 @@ function Admin() {
     fetch(`${config.apiUrl}/api/admin/participants/delete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ participant_id, password: adminPassword })
+      body: JSON.stringify({ participant_id, password: password })
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           fetchParticipants(showParticipantsJeuId);
-          refreshStats();
+          refreshStats(password);
         }
         setDeletingParticipant(null);
       })
@@ -188,13 +188,13 @@ function Admin() {
     fetch(`${config.apiUrl}/api/admin/jeux/delete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jeu_id, password: adminPassword })
+      body: JSON.stringify({ jeu_id, password: password })
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           fetchJeux();
-          refreshStats();
+          refreshStats(password);
         }
         setDeletingJeuId(null);
       })
@@ -230,14 +230,14 @@ function Admin() {
     fetch(`${config.apiUrl}/api/admin/jeux/edit`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...editForm, password: adminPassword })
+      body: JSON.stringify({ ...editForm, password: password })
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           setEditSuccess('Jeu modifié !');
           setEditJeu(null);
-          fetchJeux(adminPassword);
+          fetchJeux(password);
         } else {
           setEditError(data.error || 'Erreur lors de la modification');
         }
@@ -247,7 +247,7 @@ function Admin() {
 
   const handleLogout = () => {
     setIsLogged(false);
-    setAdminPassword('');
+    setSessionPassword('');
     setJeux([]);
     setParticipants([]);
     setShowParticipantsJeuId(null);
@@ -316,11 +316,11 @@ function Admin() {
     return stats;
   };
 
-  const refreshStats = () => {
+  const refreshStats = (pwd) => {
     fetch(`${config.apiUrl}/api/admin/stats`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: adminPassword })
+      body: JSON.stringify({ password: pwd })
     })
       .then(res => res.json())
       .then(data => {
@@ -331,7 +331,6 @@ function Admin() {
           setStatsError('');
           setStats(data);
         }
-        console.log('Réponse stats:', data);
       })
       .catch(e => {
         setStatsError('Erreur lors de la récupération des stats');
@@ -340,31 +339,10 @@ function Admin() {
   };
 
   useEffect(() => {
-    if (isLogged && adminPassword) {
-      fetchJeux(adminPassword);
-      fetch(`${config.apiUrl}/api/admin/stats`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: adminPassword })
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.error) {
-            setStatsError(data.error);
-            setStats({ totalParticipants: 0, hommes: 0, femmes: 0, ageMoyen: null, participantsParJeu: {}, participationParJour: {} });
-          } else {
-            setStatsError('');
-            setStats(data);
-          }
-          console.log('Réponse stats:', data);
-        })
-        .catch(e => {
-          setStatsError('Erreur lors de la récupération des stats');
-          console.error('Erreur stats:', e);
-        });
+    if (isLogged && sessionPassword) {
+      fetchJeux(sessionPassword);
     }
-    // eslint-disable-next-line
-  }, [isLogged, adminPassword]);
+  }, [isLogged, sessionPassword]);
 
   return (
     <div className="admin-container">
@@ -417,27 +395,29 @@ function Admin() {
           <div className="login-container">
             <div className="login-box">
               <h2>Connexion Admin</h2>
-              <div className="form-group">
-                <label>Mot de passe</label>
-                <input
-                  type="password"
-                  value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSubmit(e)}
-                />
-              </div>
-              <button
-                className="login-button"
-                onClick={handleSubmit}
-                disabled={loadingJeux}
-              >
-                {loadingJeux ? 'Connexion...' : 'Se connecter'}
-              </button>
-              {error && (
-                <div className="error-message">
-                  {error}
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label>Mot de passe</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Entrez le mot de passe admin"
+                  />
                 </div>
-              )}
+                <button
+                  type="submit"
+                  className="login-button"
+                  disabled={loadingJeux}
+                >
+                  {loadingJeux ? 'Connexion...' : 'Se connecter'}
+                </button>
+                {error && (
+                  <div className="error-message">
+                    {error}
+                  </div>
+                )}
+              </form>
             </div>
           </div>
         ) : (
@@ -448,7 +428,7 @@ function Admin() {
                 {activeSection === 'jeux' && 'Jeux concours'}
                 {activeSection === 'participants' && 'Participants'}
               </h1>
-              <button className="refresh-button" onClick={refreshStats}>
+              <button className="refresh-button" onClick={() => refreshStats(password)}>
                 <i className="fas fa-sync-alt"></i>
                 Actualiser
               </button>
