@@ -876,8 +876,8 @@
   }
 }
 
-/* Suppression de l'encadré blanc principal */
-.admin-main, .content-card, .admin-wrapper, .admin-box, .admin-panel {
+/* Suppression renforcée de tout encadré blanc autour du panneau admin */
+.admin-main, .content-card, .admin-wrapper, .admin-box, .admin-panel, .container, .main-content, .MuiPaper-root, .MuiContainer-root, .MuiCard-root, .MuiBox-root, .Paper-root, .Card-root, .Box-root {
   background: transparent !important;
   border: none !important;
   border-radius: 0 !important;
@@ -886,6 +886,13 @@
   padding: 0 !important;
   width: 100% !important;
   max-width: 100% !important;
+}
+
+/* Pour les balises section, main, article qui pourraient servir de wrapper */
+section, main, article {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* S'assurer que le body et le root prennent toute la largeur */
