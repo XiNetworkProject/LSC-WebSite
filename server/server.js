@@ -458,9 +458,131 @@ app.post('/api/verify-recaptcha', async (req, res) => {
   }
 });
 
+// Route de test pour ajouter un jeu de test
+app.post('/api/admin/test-jeu', (req, res) => {
+  const { password } = req.body;
+  console.log('Requête /api/admin/test-jeu reçue');
+  console.log('Mot de passe fourni:', password);
+  console.log('ADMIN_PASSWORD:', ADMIN_PASSWORD);
+  
+  if (password !== ADMIN_PASSWORD) {
+    console.log('Mot de passe incorrect');
+    return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
+  }
+
+  const jeuTest = {
+    titre: 'Jeu de test',
+    description: 'Description du jeu de test',
+    date_debut: new Date().toISOString().split('T')[0],
+    date_fin: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    banniere: '',
+    age_minimum: 18,
+    lots: JSON.stringify([
+      { rang: 1, description: 'Premier lot', valeur: '100€' },
+      { rang: 2, description: 'Deuxième lot', valeur: '50€' }
+    ])
+  };
+
+  console.log('Tentative d\'ajout du jeu de test:', jeuTest);
+  
+  db.run(
+    'INSERT INTO jeux (titre, description, date_debut, date_fin, banniere, age_minimum, lots) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [jeuTest.titre, jeuTest.description, jeuTest.date_debut, jeuTest.date_fin, jeuTest.banniere, jeuTest.age_minimum, jeuTest.lots],
+    function(err) {
+      if (err) {
+        console.log('Erreur lors de l\'ajout du jeu de test:', err.message);
+        return res.status(500).json({ success: false, error: err.message });
+      }
+      console.log('Jeu de test ajouté avec succès, ID:', this.lastID);
+      res.json({ success: true, id: this.lastID });
+    }
+  );
+});
+
 // Route par défaut pour servir l'application React
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
+
+// Endpoint pour enregistrer un gagnant
+app.post('/api/admin/winner', async (req, res) => {
+  const { password, jeu_id, participant_id } = req.body;
+
+  if (password !== process.env.ADMIN_PASSWORD) {
+    console.log('Tentative d\'accès non autorisée à l\'endpoint winner');
+    return res.status(401).json({ error: 'Non autorisé' });
+  }
+
+  try {
+    // Vérifier si le jeu existe
+    const jeu = await db.get('SELECT * FROM jeux WHERE id = ?', [jeu_id]);
+    if (!jeu) {
+      return res.status(404).json({ error: 'Jeu non trouvé' });
+    }
+
+    // Vérifier si le participant existe
+    const participant = await db.get('SELECT * FROM participants WHERE id = ?', [participant_id]);
+    if (!participant) {
+      return res.status(404).json({ error: 'Participant non trouvé' });
+    }
+
+    // Vérifier si le participant est bien inscrit à ce jeu
+    const inscription = await db.get(
+      'SELECT * FROM inscriptions WHERE jeu_id = ? AND participant_id = ?',
+      [jeu_id, participant_id]
+    );
+    if (!inscription) {
+      return res.status(400).json({ error: 'Le participant n\'est pas inscrit à ce jeu' });
+    }
+
+    // Vérifier si un gagnant existe déjà pour ce jeu
+    const existingWinner = await db.get('SELECT * FROM gagnants WHERE jeu_id = ?', [jeu_id]);
+    if (existingWinner) {
+      return res.status(400).json({ error: 'Un gagnant existe déjà pour ce jeu' });
+    }
+
+    // Enregistrer le gagnant
+    await db.run(
+      'INSERT INTO gagnants (jeu_id, participant_id, date_tirage) VALUES (?, ?, datetime("now"))',
+      [jeu_id, participant_id]
+    );
+
+    console.log(`Gagnant enregistré pour le jeu ${jeu_id}: ${participant.prenom} ${participant.nom}`);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Erreur lors de l\'enregistrement du gagnant:', err);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// Endpoint pour récupérer les gagnants
+app.get('/api/admin/winners', async (req, res) => {
+  const { password } = req.query;
+
+  if (password !== process.env.ADMIN_PASSWORD) {
+    console.log('Tentative d\'accès non autorisée à l\'endpoint winners');
+    return res.status(401).json({ error: 'Non autorisé' });
+  }
+
+  try {
+    const winners = await db.all(`
+      SELECT 
+        g.*,
+        j.titre as jeu_titre,
+        p.prenom,
+        p.nom,
+        p.email
+      FROM gagnants g
+      JOIN jeux j ON g.jeu_id = j.id
+      JOIN participants p ON g.participant_id = p.id
+      ORDER BY g.date_tirage DESC
+    `);
+
+    res.json(winners);
+  } catch (err) {
+    console.error('Erreur lors de la récupération des gagnants:', err);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
 });
 
 // Démarrage du serveur

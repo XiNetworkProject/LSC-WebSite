@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLock, faUserShield, faChartBar, faGift, faUsers, faVenusMars, faBirthdayCake, faSync, faPlus, faTrash, faEdit, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faLock, faUserShield, faChartBar, faGift, faUsers, faVenusMars, faBirthdayCake, faSync, faPlus, faTrash, faEdit, faCalendar, faRandom, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import config from '../config';
 import './Admin.css';
 
@@ -52,6 +52,10 @@ function Admin() {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showNewJeuForm, setShowNewJeuForm] = useState(false);
   const [deletingJeuId, setDeletingJeuId] = useState(null);
+  const [selectedWinner, setSelectedWinner] = useState(null);
+  const [drawingWinner, setDrawingWinner] = useState(false);
+  const [showDrawModal, setShowDrawModal] = useState(false);
+  const [selectedJeuForDraw, setSelectedJeuForDraw] = useState(null);
 
   // Ajout de nouveaux états pour le tableau de bord
   const [dashboardStats, setDashboardStats] = useState({
@@ -391,6 +395,67 @@ function Admin() {
       });
   };
 
+  // Fonction pour effectuer un tirage au sort
+  const handleDrawWinner = (jeuId) => {
+    setDrawingWinner(true);
+    setSelectedJeuForDraw(jeuId);
+    setShowDrawModal(true);
+    
+    // Récupérer tous les participants du jeu
+    fetch(`${config.apiUrl}/api/admin/participants`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        jeu_id: jeuId, 
+        password: sessionPassword,
+        searchTerm: ''
+      })
+    })
+      .then(res => res.json())
+      .then(participants => {
+        if (participants.length === 0) {
+          setDrawingWinner(false);
+          alert('Aucun participant pour ce jeu');
+          return;
+        }
+        
+        // Animation de tirage au sort
+        let count = 0;
+        const maxCount = 20;
+        const interval = setInterval(() => {
+          const randomIndex = Math.floor(Math.random() * participants.length);
+          setSelectedWinner(participants[randomIndex]);
+          count++;
+          
+          if (count >= maxCount) {
+            clearInterval(interval);
+            setDrawingWinner(false);
+            // Sauvegarder le gagnant
+            fetch(`${config.apiUrl}/api/admin/winner`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                jeu_id: jeuId,
+                participant_id: participants[randomIndex].id,
+                password: sessionPassword
+              })
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                console.log('Gagnant enregistré');
+              }
+            })
+            .catch(err => console.error('Erreur lors de l\'enregistrement du gagnant:', err));
+          }
+        }, 100);
+      })
+      .catch(err => {
+        console.error('Erreur lors du tirage au sort:', err);
+        setDrawingWinner(false);
+      });
+  };
+
   useEffect(() => {
     if (isLogged && sessionPassword) {
       fetchJeux(sessionPassword);
@@ -712,17 +777,31 @@ function Admin() {
                         <div className="jeu-actions">
                           <button
                             className="view-button"
-                            onClick={() => handleShowParticipants(jeu.id)}
+                            onClick={() => {
+                              setActiveSection('participants');
+                              handleShowParticipants(jeu.id);
+                            }}
                           >
                             <FontAwesomeIcon icon={faUsers} />
                             Participants
                           </button>
                           <button
                             className="edit-button"
-                            onClick={() => handleEditJeu(jeu)}
+                            onClick={() => {
+                              setActiveSection('jeux');
+                              handleEditJeu(jeu);
+                            }}
                           >
                             <FontAwesomeIcon icon={faEdit} />
                             Modifier
+                          </button>
+                          <button
+                            className="draw-button"
+                            onClick={() => handleDrawWinner(jeu.id)}
+                            disabled={drawingWinner}
+                          >
+                            <FontAwesomeIcon icon={faRandom} />
+                            Tirage au sort
                           </button>
                           <button
                             className="delete-button"
@@ -801,6 +880,38 @@ function Admin() {
                     </table>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Modal de tirage au sort */}
+            {showDrawModal && (
+              <div className="modal-overlay">
+                <div className="modal-content">
+                  <h2>Tirage au sort</h2>
+                  {drawingWinner ? (
+                    <div className="drawing-animation">
+                      <div className="spinner"></div>
+                      <p>Tirage en cours...</p>
+                    </div>
+                  ) : selectedWinner ? (
+                    <div className="winner-announcement">
+                      <FontAwesomeIcon icon={faTrophy} className="trophy-icon" />
+                      <h3>Le gagnant est :</h3>
+                      <p className="winner-name">{selectedWinner.prenom} {selectedWinner.nom}</p>
+                      <p className="winner-email">{selectedWinner.email}</p>
+                      <button 
+                        className="close-button"
+                        onClick={() => {
+                          setShowDrawModal(false);
+                          setSelectedWinner(null);
+                          setSelectedJeuForDraw(null);
+                        }}
+                      >
+                        Fermer
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
               </div>
             )}
           </>

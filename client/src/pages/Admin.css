@@ -232,48 +232,61 @@
 
 .jeu-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.jeu-actions button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.jeu-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .view-button {
-  padding: 0.5rem 1rem;
-  background: #3498db;
+  background-color: #4a90e2;
   color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  flex: 1;
-  transition: all 0.2s;
-  font-weight: 500;
 }
 
 .view-button:hover {
-  background: #2980b9;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background-color: #357abd;
+}
+
+.edit-button {
+  background-color: #f0ad4e;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #eea236;
+}
+
+.draw-button {
+  background-color: #5cb85c;
+  color: white;
+}
+
+.draw-button:hover {
+  background-color: #4cae4c;
 }
 
 .delete-button {
-  padding: 0.5rem 1rem;
-  background: #e74c3c;
+  background-color: #d9534f;
   color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  flex: 1;
-  transition: all 0.2s;
-  font-weight: 500;
 }
 
 .delete-button:hover {
-  background: #c0392b;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.delete-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+  background-color: #c9302c;
 }
 
 /* Tableau des participants */
@@ -639,6 +652,86 @@
 .gender-badge.female {
   background: #fce4ec;
   color: #c2185b;
+}
+
+/* Styles pour le modal de tirage au sort */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 24px;
+  border-radius: 8px;
+  min-width: 400px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.drawing-animation {
+  padding: 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.winner-announcement {
+  padding: 20px;
+}
+
+.trophy-icon {
+  font-size: 48px;
+  color: #f1c40f;
+  margin-bottom: 16px;
+}
+
+.winner-name {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin: 16px 0 8px;
+}
+
+.winner-email {
+  color: #7f8c8d;
+  margin-bottom: 24px;
+}
+
+.close-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+  background-color: #2980b9;
 }
 
 /* Responsive */
