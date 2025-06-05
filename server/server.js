@@ -1,7 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
-const fetch = require('node-fetch');
+// Remplacer l'importation de fetch par une fonction asynchrone
+let fetch;
+(async () => {
+  fetch = (await import('node-fetch')).default;
+})();
 
 const app = express();
 app.use(express.json());
@@ -353,6 +357,27 @@ app.post('/api/admin/participants', (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
+});
+
+// Modifier la route de vérification reCAPTCHA pour utiliser async/await
+app.post('/api/verify-recaptcha', async (req, res) => {
+  const { token } = req.body;
+  
+  try {
+    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `secret=${RECAPTCHA_SECRET}&response=${token}`,
+    });
+    
+    const data = await response.json();
+    res.json({ success: data.success });
+  } catch (error) {
+    console.error('Erreur de vérification reCAPTCHA:', error);
+    res.status(500).json({ success: false, error: 'Erreur de vérification reCAPTCHA' });
+  }
 });
 
 // Démarrage du serveur
