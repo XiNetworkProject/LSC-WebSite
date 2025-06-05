@@ -903,4 +903,27 @@ body, #root {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Suppression du padding sur tous les conteneurs principaux */
+.admin-container,
+.admin-content,
+.container,
+.main-content,
+.admin-main,
+.content-card,
+.admin-wrapper,
+.admin-box,
+.admin-panel,
+.MuiPaper-root,
+.MuiContainer-root,
+.MuiCard-root,
+.MuiBox-root,
+.Paper-root,
+.Card-root,
+.Box-root,
+section,
+main,
+article {
+  padding: 0 !important;
 } 
