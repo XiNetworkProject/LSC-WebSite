@@ -37,6 +37,7 @@ const RECAPTCHA_SECRET = '6Le5JkUrAAAAAPUTbm2QtQKWwbPW7r0Us7us51qu'; // À rempl
 // Mot de passe admin (à personnaliser si besoin)
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 console.log('ADMIN_PASSWORD configuré:', ADMIN_PASSWORD ? 'Oui' : 'Non');
+console.log('Valeur de ADMIN_PASSWORD:', ADMIN_PASSWORD);
 if (!ADMIN_PASSWORD) {
   console.error('ERREUR: ADMIN_PASSWORD n\'est pas défini dans les variables d\'environnement');
   process.exit(1);
@@ -302,9 +303,13 @@ app.post('/api/admin/stats', (req, res) => {
 // Connexion admin
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body;
+  console.log('Tentative de connexion avec le mot de passe:', password);
+  console.log('Comparaison avec ADMIN_PASSWORD:', ADMIN_PASSWORD);
   if (password === ADMIN_PASSWORD) {
+    console.log('Connexion réussie');
     res.json({ success: true });
   } else {
+    console.log('Échec de la connexion');
     res.status(401).json({ success: false, error: 'Mot de passe incorrect' });
   }
 });
