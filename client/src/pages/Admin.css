@@ -874,4 +874,26 @@
   .participants-table td {
     padding: 0.75rem;
   }
+}
+
+/* Suppression de l'encadré blanc principal */
+.admin-main, .content-card, .admin-wrapper, .admin-box, .admin-panel {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* S'assurer que le body et le root prennent toute la largeur */
+body, #root {
+  background: #f5f5f5;
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 } 
