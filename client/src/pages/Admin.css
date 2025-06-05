@@ -490,85 +490,153 @@
 
 /* Styles pour le formulaire de jeu */
 .form-container {
-  background: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+.form-container h3 {
+  margin: 0 0 20px;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="number"],
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="date"]:focus,
+.form-group input[type="number"]:focus,
+.form-group textarea:focus {
+  border-color: #3498db;
+  outline: none;
 }
 
 .form-group textarea {
-  width: 100%;
   min-height: 100px;
-  padding: 0.75rem;
-  border: 2px solid #eee;
-  border-radius: 8px;
-  font-size: 1rem;
   resize: vertical;
 }
 
-.lot-input {
+/* Styles pour les lots */
+.lot-inputs {
   display: grid;
   grid-template-columns: 80px 1fr 1fr auto;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 10px;
+  margin-bottom: 10px;
   align-items: center;
 }
 
 .remove-lot-button {
-  padding: 0.5rem;
-  background: #fee;
-  color: #c00;
+  background: none;
   border: none;
-  border-radius: 4px;
+  color: #e74c3c;
   cursor: pointer;
+  padding: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.remove-lot-button:hover {
+  color: #c0392b;
+}
+
 .add-lot-button {
-  margin-top: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: #e3f2fd;
-  color: #1976d2;
-  border: none;
+  background: #f8f9fa;
+  border: 1px dashed #ddd;
+  color: #666;
+  padding: 10px;
   border-radius: 4px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
+.add-lot-button:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+/* Messages d'erreur et de succès */
+.error-message {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.success-message {
+  background: #dcfce7;
+  color: #16a34a;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+/* Actions du formulaire */
 .form-actions {
   display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: 12px;
+  margin-top: 24px;
 }
 
 .submit-button {
-  padding: 0.75rem 1.5rem;
-  background: #2ecc71;
+  background: #3498db;
   color: white;
   border: none;
-  border-radius: 8px;
+  padding: 12px 24px;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
+  flex: 1;
+  transition: background-color 0.2s ease;
+}
+
+.submit-button:hover {
+  background: #2980b9;
 }
 
 .cancel-button {
-  padding: 0.75rem 1.5rem;
   background: #e74c3c;
   color: white;
   border: none;
-  border-radius: 8px;
+  padding: 12px 24px;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
+  flex: 1;
+  transition: background-color 0.2s ease;
+}
+
+.cancel-button:hover {
+  background: #c0392b;
 }
 
 /* Styles pour les cartes de jeux */

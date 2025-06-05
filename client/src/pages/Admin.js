@@ -734,6 +734,161 @@ function Admin() {
                   </div>
                 )}
 
+                {editJeu && (
+                  <div className="form-container">
+                    <h3>Modifier le jeu concours</h3>
+                    <form onSubmit={handleEditSubmit}>
+                      <div className="form-group">
+                        <label>Titre</label>
+                        <input
+                          type="text"
+                          value={editForm.titre}
+                          onChange={(e) => setEditForm({ ...editForm, titre: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Description</label>
+                        <textarea
+                          value={editForm.description}
+                          onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Date de début</label>
+                        <input
+                          type="date"
+                          value={editForm.date_debut}
+                          onChange={(e) => setEditForm({ ...editForm, date_debut: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Date de fin</label>
+                        <input
+                          type="date"
+                          value={editForm.date_fin}
+                          onChange={(e) => setEditForm({ ...editForm, date_fin: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Bannière (URL)</label>
+                        <input
+                          type="text"
+                          value={editForm.banniere}
+                          onChange={(e) => setEditForm({ ...editForm, banniere: e.target.value })}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Âge minimum</label>
+                        <input
+                          type="number"
+                          min="18"
+                          value={editForm.age_minimum}
+                          onChange={(e) => setEditForm({ ...editForm, age_minimum: parseInt(e.target.value) || 18 })}
+                          required
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Lots</label>
+                        {editForm.lots.map((lot, index) => (
+                          <div key={index} className="lot-inputs">
+                            <input
+                              type="number"
+                              placeholder="Rang"
+                              value={lot.rang}
+                              onChange={(e) => {
+                                const newLots = [...editForm.lots];
+                                newLots[index] = { ...lot, rang: parseInt(e.target.value) || 1 };
+                                setEditForm({ ...editForm, lots: newLots });
+                              }}
+                              min="1"
+                              required
+                            />
+                            <input
+                              type="text"
+                              placeholder="Description"
+                              value={lot.description}
+                              onChange={(e) => {
+                                const newLots = [...editForm.lots];
+                                newLots[index] = { ...lot, description: e.target.value };
+                                setEditForm({ ...editForm, lots: newLots });
+                              }}
+                              required
+                            />
+                            <input
+                              type="text"
+                              placeholder="Valeur"
+                              value={lot.valeur}
+                              onChange={(e) => {
+                                const newLots = [...editForm.lots];
+                                newLots[index] = { ...lot, valeur: e.target.value };
+                                setEditForm({ ...editForm, lots: newLots });
+                              }}
+                              required
+                            />
+                            {index > 0 && (
+                              <button
+                                type="button"
+                                className="remove-lot-button"
+                                onClick={() => {
+                                  const newLots = editForm.lots.filter((_, i) => i !== index);
+                                  setEditForm({ ...editForm, lots: newLots });
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          className="add-lot-button"
+                          onClick={() => {
+                            setEditForm(prev => ({
+                              ...prev,
+                              lots: [...prev.lots, { rang: prev.lots.length + 1, description: '', valeur: '' }]
+                            }));
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faPlus} />
+                          Ajouter un lot
+                        </button>
+                      </div>
+
+                      {editError && <div className="error-message">{editError}</div>}
+                      {editSuccess && <div className="success-message">{editSuccess}</div>}
+
+                      <div className="form-actions">
+                        <button type="submit" className="submit-button">
+                          Enregistrer les modifications
+                        </button>
+                        <button
+                          type="button"
+                          className="cancel-button"
+                          onClick={() => {
+                            setEditJeu(null);
+                            setEditForm({
+                              id: '',
+                              titre: '',
+                              description: '',
+                              date_debut: '',
+                              date_fin: '',
+                              banniere: '',
+                              lots: [{ rang: 1, description: '', valeur: '' }],
+                              age_minimum: 18
+                            });
+                          }}
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
                 {loadingJeux ? (
                   <div className="loading-message">Chargement...</div>
                 ) : jeux.length === 0 ? (
