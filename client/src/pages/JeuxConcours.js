@@ -102,7 +102,11 @@ function JeuxConcours() {
     fetch(`${config.apiUrl}/api/participer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...formData, jeu_id: formJeuId })
+      body: JSON.stringify({ 
+        ...formData, 
+        jeu_id: formJeuId,
+        antiBotAnswer: antiBot
+      })
     })
       .then(res => res.json())
       .then(data => {
