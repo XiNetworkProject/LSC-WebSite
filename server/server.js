@@ -317,11 +317,20 @@ app.post('/api/admin/login', (req, res) => {
 // Liste des jeux (admin)
 app.post('/api/admin/jeux/list', (req, res) => {
   const { password } = req.body;
+  console.log('Requête /api/admin/jeux/list reçue');
+  console.log('Mot de passe fourni:', password);
+  console.log('ADMIN_PASSWORD:', ADMIN_PASSWORD);
   if (password !== ADMIN_PASSWORD) {
+    console.log('Mot de passe incorrect');
     return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
   }
+  console.log('Mot de passe correct, récupération des jeux...');
   db.all('SELECT * FROM jeux ORDER BY date_debut DESC', [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) {
+      console.log('Erreur lors de la récupération des jeux:', err.message);
+      return res.status(500).json({ error: err.message });
+    }
+    console.log(`${rows.length} jeux trouvés`);
     const jeux = rows.map(jeu => ({ ...jeu, lots: JSON.parse(jeu.lots || '[]') }));
     res.json(jeux);
   });
@@ -330,15 +339,25 @@ app.post('/api/admin/jeux/list', (req, res) => {
 // Ajouter un jeu (admin)
 app.post('/api/admin/jeux', (req, res) => {
   const { password, titre, description, date_debut, date_fin, banniere, age_minimum, lots } = req.body;
+  console.log('Requête /api/admin/jeux reçue');
+  console.log('Mot de passe fourni:', password);
+  console.log('ADMIN_PASSWORD:', ADMIN_PASSWORD);
+  console.log('Données du jeu:', { titre, description, date_debut, date_fin, banniere, age_minimum, lots });
   if (password !== ADMIN_PASSWORD) {
+    console.log('Mot de passe incorrect');
     return res.status(401).json({ error: 'Mot de passe admin incorrect.' });
   }
+  console.log('Mot de passe correct, ajout du jeu...');
   const lotsJson = JSON.stringify(lots || []);
   db.run(
     'INSERT INTO jeux (titre, description, date_debut, date_fin, banniere, age_minimum, lots) VALUES (?, ?, ?, ?, ?, ?, ?)',
     [titre, description, date_debut, date_fin, banniere, age_minimum || 18, lotsJson],
     function(err) {
-      if (err) return res.status(500).json({ success: false, error: err.message });
+      if (err) {
+        console.log('Erreur lors de l\'ajout du jeu:', err.message);
+        return res.status(500).json({ success: false, error: err.message });
+      }
+      console.log('Jeu ajouté avec succès, ID:', this.lastID);
       res.json({ success: true, id: this.lastID });
     }
   );
