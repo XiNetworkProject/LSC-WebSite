@@ -50,6 +50,8 @@ function Admin() {
   const [searchTerm, setSearchTerm] = useState('');
   const [deletingParticipant, setDeletingParticipant] = useState(null);
   const [activeSection, setActiveSection] = useState('dashboard');
+  const [showNewJeuForm, setShowNewJeuForm] = useState(false);
+  const [deletingJeuId, setDeletingJeuId] = useState(null);
 
   // Connexion admin
   const handleSubmit = (e) => {
@@ -179,17 +181,24 @@ function Admin() {
   };
 
   // Supprimer un jeu concours
-  const handleDeleteJeu = (id) => {
-    if (!window.confirm('Supprimer ce jeu ?')) return;
+  const handleDeleteJeu = (jeu_id) => {
+    if (!window.confirm('Supprimer ce jeu concours ?')) return;
+    setDeletingJeuId(jeu_id);
+    
     fetch(`${config.apiUrl}/api/admin/jeux/delete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, password: adminPassword })
+      body: JSON.stringify({ jeu_id, password: adminPassword })
     })
       .then(res => res.json())
       .then(data => {
-        if (data.success) fetchJeux(adminPassword);
-      });
+        if (data.success) {
+          fetchJeux();
+          refreshStats();
+        }
+        setDeletingJeuId(null);
+      })
+      .catch(() => setDeletingJeuId(null));
   };
 
   // Préparer la modification d'un jeu
