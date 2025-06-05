@@ -1,11 +1,17 @@
 /* Layout principal */
 .admin-container {
-  display: flex;
-  min-height: calc(100vh - 60px); /* Soustraire la hauteur de la navbar */
-  background-color: #f5f5f5;
-  margin-top: 60px; /* Ajouter une marge pour la navbar */
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 0;
+  width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+}
+
+.admin-content {
+  padding: 24px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
 }
 
 /* Barre latérale */
@@ -89,273 +95,72 @@
   background: #c0392b;
 }
 
-/* Contenu principal */
-.admin-main {
-  flex: 1;
-  margin-left: 250px;
-  padding: 2rem;
-  overflow-y: auto;
-  max-width: calc(100% - 250px); /* Limiter la largeur */
-  box-sizing: border-box;
-}
-
 /* En-tête */
 .admin-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+  background: white;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 24px;
 }
 
-.admin-header h1 {
+.admin-header h2 {
   margin: 0;
-  font-size: 1.75rem;
   color: #2c3e50;
+  font-size: 1.5rem;
 }
 
-.refresh-button {
-  padding: 0.5rem 1rem;
-  background: #3498db;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.logout-button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  transition: background-color 0.2s;
-}
-
-.refresh-button:hover {
-  background: #2980b9;
-}
-
-/* Cartes de statistiques */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.stat-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: transform 0.2s;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-}
-
-.stat-card h3 {
-  margin: 0 0 1rem;
-  color: #2c3e50;
-  font-size: 1.1rem;
-}
-
-.stat-value {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #3498db;
-}
-
-/* Cartes de contenu */
-.content-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  margin-bottom: 1.5rem;
-}
-
-.card-header {
-  margin-bottom: 1.5rem;
-}
-
-.add-button {
-  padding: 0.75rem 1.5rem;
-  background: #2ecc71;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-  font-weight: 500;
-}
-
-.add-button:hover {
-  background: #27ae60;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-/* Grille de jeux */
-.jeux-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.jeu-card {
-  background: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid #eee;
-}
-
-.jeu-card h3 {
-  margin: 0 0 1rem;
-  color: #2c3e50;
-}
-
-.jeu-info {
-  margin-bottom: 1rem;
-  color: #666;
-}
-
-.jeu-info > div {
-  margin-bottom: 0.5rem;
-}
-
-.jeu-info i {
-  margin-right: 0.5rem;
-  width: 16px;
-}
-
-.jeu-actions {
-  display: flex;
   gap: 8px;
-  margin-top: 12px;
-}
-
-.jeu-actions button {
-  padding: 8px 12px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9em;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-}
-
-.jeu-actions button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.view-button {
-  background-color: #4a90e2;
+  border-radius: 8px;
+  background: #e74c3c;
   color: white;
-}
-
-.view-button:hover {
-  background-color: #357abd;
-}
-
-.edit-button {
-  background-color: #f0ad4e;
-  color: white;
-}
-
-.edit-button:hover {
-  background-color: #eea236;
-}
-
-.draw-button {
-  background-color: #5cb85c;
-  color: white;
-}
-
-.draw-button:hover {
-  background-color: #4cae4c;
-}
-
-.delete-button {
-  background-color: #d9534f;
-  color: white;
-}
-
-.delete-button:hover {
-  background-color: #c9302c;
-}
-
-/* Tableau des participants */
-.search-container {
-  margin-bottom: 1.5rem;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
   font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.table-container {
-  overflow-x: auto;
-}
-
-.participants-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: white;
-}
-
-.participants-table th {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 2px solid #eee;
-  background-color: #f8f9fa;
-  color: #2c3e50;
-  font-weight: 600;
-}
-
-.participants-table td {
-  padding: 1rem;
-  border-bottom: 1px solid #eee;
-}
-
-.participants-table tr:hover {
-  background-color: #f8f9fa;
-}
-
-/* Messages */
-.loading-message,
-.empty-message {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
+.logout-button:hover {
+  background: #c0392b;
 }
 
 /* Formulaire de connexion */
 .login-container {
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 24px;
+  background: #f8f9fa;
 }
 
-.login-box {
+.login-card {
   background: white;
-  padding: 2rem;
+  padding: 32px;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
 }
 
-.login-box h2 {
+.login-card h2 {
+  margin: 0 0 24px;
   color: #2c3e50;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
+  text-align: center;
+  font-size: 1.75rem;
 }
 
 .form-group {
@@ -490,11 +295,9 @@
 
 /* Styles pour le formulaire de jeu */
 .form-container {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  width: 100%;
+  max-width: 100%;
+  margin: 0 0 24px 0;
 }
 
 .form-container h3 {
@@ -802,8 +605,73 @@
   background-color: #2980b9;
 }
 
+/* Navigation */
+.admin-nav {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #f8f9fa;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-button:hover {
+  background: #e9ecef;
+  color: #2c3e50;
+}
+
+.nav-button.active {
+  background: #3498db;
+  color: white;
+}
+
+.nav-button.active:hover {
+  background: #2980b9;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+  .admin-content {
+    padding: 16px;
+  }
+
+  .content-card {
+    padding: 16px;
+  }
+
+  .jeux-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .submit-button,
+  .cancel-button {
+    width: 100%;
+  }
+
   .admin-container {
     margin-top: 50px; /* Ajuster pour la navbar mobile */
   }
@@ -819,14 +687,6 @@
     max-width: calc(100% - 200px);
   }
   
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .jeux-grid {
-    grid-template-columns: 1fr;
-  }
-
   .form-row {
     grid-template-columns: 1fr;
   }
@@ -846,6 +706,32 @@
 
   .participation-bar {
     min-width: 40px;
+  }
+
+  .admin-nav {
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  .nav-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .logout-button {
+    width: 100%;
+    justify-content: center;
   }
 }
 
