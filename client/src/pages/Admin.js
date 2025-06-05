@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faUserShield, faChartBar, faGift, faUsers, faVenusMars, faBirthdayCake } from '@fortawesome/free-solid-svg-icons';
 import config from '../config';
+import './Admin.css';
 
 function Admin() {
   const [password, setPassword] = useState('');
@@ -46,6 +47,9 @@ function Admin() {
     participationParJour: {}
   });
   const [statsError, setStatsError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [deletingParticipant, setDeletingParticipant] = useState(null);
+  const [activeSection, setActiveSection] = useState('dashboard');
 
   // Connexion admin
   const handleSubmit = (e) => {
@@ -119,10 +123,19 @@ function Admin() {
   const handleShowParticipants = (jeu_id) => {
     setParticipantsLoading(true);
     setShowParticipantsJeuId(jeu_id);
+    fetchParticipants(jeu_id);
+  };
+
+  // Fonction pour récupérer les participants avec recherche
+  const fetchParticipants = (jeu_id) => {
     fetch(`${config.apiUrl}/api/admin/participants`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jeu_id, password: adminPassword })
+      body: JSON.stringify({ 
+        jeu_id, 
+        password: adminPassword,
+        searchTerm: searchTerm.trim()
+      })
     })
       .then(res => res.json())
       .then(data => {
@@ -134,6 +147,35 @@ function Admin() {
         setParticipants([]);
         setParticipantsLoading(false);
       });
+  };
+
+  // Supprimer un participant
+  const handleDeleteParticipant = (participant_id) => {
+    if (!window.confirm('Supprimer ce participant ?')) return;
+    setDeletingParticipant(participant_id);
+    
+    fetch(`${config.apiUrl}/api/admin/participants/delete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ participant_id, password: adminPassword })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          fetchParticipants(showParticipantsJeuId);
+          refreshStats();
+        }
+        setDeletingParticipant(null);
+      })
+      .catch(() => setDeletingParticipant(null));
+  };
+
+  // Gérer la recherche
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    if (showParticipantsJeuId) {
+      fetchParticipants(showParticipantsJeuId);
+    }
   };
 
   // Supprimer un jeu concours
@@ -316,249 +358,221 @@ function Admin() {
   }, [isLogged, adminPassword]);
 
   return (
-    <div className="admin">
-      <h2><FontAwesomeIcon icon={faLock} style={{color:'#ff9e3d',marginRight:10}} />Espace administrateur</h2>
-      {!isLogged ? (
-        <form onSubmit={handleSubmit} style={{maxWidth:350,margin:'2rem auto',textAlign:'left'}}>
-          <label>Mot de passe<br/>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              style={{width:'100%',padding:8,marginTop:5}}
-              required
-            />
-          </label>
-          {error && <div style={{color:'red',marginTop:10}}>{error}</div>}
-          <button type="submit" className="admin-login-btn">
-            <FontAwesomeIcon icon={faUserShield} style={{marginRight:8}} />Connexion
+    <div className="admin-container">
+      {/* Barre latérale */}
+      <aside className="admin-sidebar">
+        <div className="sidebar-header">
+          <h2>Admin LSC</h2>
+          <p>Panneau de contrôle</p>
+        </div>
+
+        <nav className="sidebar-nav">
+          <button
+            className={`nav-item ${activeSection === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setActiveSection('dashboard')}
+          >
+            <i className="fas fa-chart-line"></i>
+            Tableau de bord
           </button>
-        </form>
-      ) : (
-        <div style={{textAlign:'center'}}>
-          <button onClick={handleLogout} style={{marginBottom:20,background:'#eee',color:'#2e8b57',border:'none',padding:'8px 20px',borderRadius:5,fontWeight:600,float:'right'}}>
+
+          <button
+            className={`nav-item ${activeSection === 'jeux' ? 'active' : ''}`}
+            onClick={() => setActiveSection('jeux')}
+          >
+            <i className="fas fa-gamepad"></i>
+            Jeux concours
+          </button>
+
+          {showParticipantsJeuId && (
+            <button
+              className={`nav-item ${activeSection === 'participants' ? 'active' : ''}`}
+              onClick={() => setActiveSection('participants')}
+            >
+              <i className="fas fa-users"></i>
+              Participants
+            </button>
+          )}
+        </nav>
+
+        <div className="sidebar-footer">
+          <button className="logout-button" onClick={handleLogout}>
+            <i className="fas fa-sign-out-alt"></i>
             Déconnexion
           </button>
-
-          {/* Statistiques */}
-          <div style={{marginBottom:40,background:'#fff',padding:20,borderRadius:12,boxShadow:'0 2px 8px rgba(0,0,0,0.07)'}}>
-            <h3><FontAwesomeIcon icon={faChartBar} style={{color:'#ff9e3d',marginRight:8}} />Statistiques</h3>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:20,marginTop:20}}>
-              <div style={{background:'#f8f9fa',padding:15,borderRadius:8}}>
-                <FontAwesomeIcon icon={faUsers} style={{color:'#2e8b57',fontSize:24,marginBottom:8}} />
-                <div style={{fontSize:24,fontWeight:700}}>{stats.totalParticipants}</div>
-                <div style={{color:'#666'}}>Participants total</div>
-              </div>
-              <div style={{background:'#f8f9fa',padding:15,borderRadius:8}}>
-                <FontAwesomeIcon icon={faVenusMars} style={{color:'#2e8b57',fontSize:24,marginBottom:8}} />
-                <div style={{fontSize:24,fontWeight:700}}>{stats.hommes}H / {stats.femmes}F</div>
-                <div style={{color:'#666'}}>Répartition</div>
-              </div>
-              <div style={{background:'#f8f9fa',padding:15,borderRadius:8}}>
-                <FontAwesomeIcon icon={faBirthdayCake} style={{color:'#2e8b57',fontSize:24,marginBottom:8}} />
-                <div style={{fontSize:24,fontWeight:700}}>
-                  {stats.ageMoyen !== null && !isNaN(stats.ageMoyen) ? Math.round(stats.ageMoyen) + ' ans' : 'N/A'}
-                </div>
-                <div style={{color:'#666'}}>Âge moyen</div>
-              </div>
-            </div>
-            {statsError && <div style={{color:'red',marginBottom:10}}>{statsError}</div>}
-          </div>
-
-          <h3>Ajouter un jeu concours</h3>
-          <form onSubmit={handleAddJeu} style={{maxWidth:600,margin:'1rem auto',textAlign:'left'}}>
-            <div style={{marginBottom:10}}>
-              <label>Titre*<br/>
-                <input type="text" name="titre" value={addForm.titre} onChange={e => setAddForm({...addForm, titre: e.target.value})} style={{width:'100%',padding:8}} required />
-              </label>
-            </div>
-            <div style={{marginBottom:10}}>
-              <label>Description<br/>
-                <textarea name="description" value={addForm.description} onChange={e => setAddForm({...addForm, description: e.target.value})} style={{width:'100%',padding:8}} />
-              </label>
-            </div>
-            <div style={{marginBottom:10,display:'flex',gap:10}}>
-              <label style={{flex:1}}>Date début<br/>
-                <input type="date" name="date_debut" value={addForm.date_debut} onChange={e => setAddForm({...addForm, date_debut: e.target.value})} style={{width:'100%',padding:8}} />
-              </label>
-              <label style={{flex:1}}>Date fin<br/>
-                <input type="date" name="date_fin" value={addForm.date_fin} onChange={e => setAddForm({...addForm, date_fin: e.target.value})} style={{width:'100%',padding:8}} />
-              </label>
-            </div>
-            <div style={{marginBottom:10}}>
-              <label>Bannière (URL)<br/>
-                <input type="text" name="banniere" value={addForm.banniere} onChange={e => setAddForm({...addForm, banniere: e.target.value})} style={{width:'100%',padding:8}} />
-              </label>
-            </div>
-            <div style={{marginBottom:20}}>
-              <label>Âge minimum*<br/>
-                <input 
-                  type="number" 
-                  name="age_minimum" 
-                  value={addForm.age_minimum} 
-                  onChange={e => setAddForm({...addForm, age_minimum: parseInt(e.target.value)})} 
-                  style={{width:'100%',padding:8}} 
-                  min="18"
-                  required 
-                />
-              </label>
-            </div>
-            <div style={{marginBottom:20}}>
-              <label style={{display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
-                <FontAwesomeIcon icon={faGift} style={{color:'#ff9e3d'}} />
-                Lots à gagner
-              </label>
-              {addForm.lots.map((lot, index) => (
-                <div key={index} style={{display:'flex',gap:10,marginBottom:10}}>
-                  <input
-                    type="number"
-                    value={lot.rang}
-                    onChange={e => handleLotChange(index, 'rang', parseInt(e.target.value))}
-                    style={{width:80,padding:8}}
-                    placeholder="Rang"
-                    min="1"
-                  />
-                  <input
-                    type="text"
-                    value={lot.description}
-                    onChange={e => handleLotChange(index, 'description', e.target.value)}
-                    style={{flex:1,padding:8}}
-                    placeholder="Description du lot"
-                  />
-                  <input
-                    type="text"
-                    value={lot.valeur}
-                    onChange={e => handleLotChange(index, 'valeur', e.target.value)}
-                    style={{width:120,padding:8}}
-                    placeholder="Valeur"
-                  />
-                  {index > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveLot(index)}
-                      style={{background:'#ffdddd',color:'#b22222',border:'none',padding:'8px 12px',borderRadius:5}}
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={handleAddLot}
-                style={{background:'#eee',color:'#2e8b57',border:'none',padding:'8px 16px',borderRadius:5,marginTop:10}}
-              >
-                + Ajouter un lot
-              </button>
-            </div>
-            {addError && <div style={{color:'red',marginBottom:10}}>{addError}</div>}
-            {addSuccess && <div style={{color:'green',marginBottom:10}}>{addSuccess}</div>}
-            <button type="submit" style={{width:'100%',padding:10,background:'#2e8b57',color:'#fff',border:'none',borderRadius:5,fontWeight:600}}>
-              Ajouter le jeu
-            </button>
-          </form>
-
-          <h3 style={{marginTop:40}}>Liste des jeux concours</h3>
-          {loadingJeux ? <p>Chargement...</p> : (
-            <ul style={{padding:0}}>
-              {jeux.map(jeu => (
-                <li key={jeu.id} style={{marginBottom: '2rem', borderBottom: '1px solid #eee', paddingBottom: '1rem', listStyle:'none'}}>
-                  {editJeu === jeu.id ? (
-                    <form onSubmit={handleEditSubmit} style={{marginBottom:20, textAlign:'left', maxWidth:400, marginLeft:'auto', marginRight:'auto'}}>
-                      <div style={{marginBottom:10}}>
-                        <label>Titre*<br/>
-                          <input type="text" name="titre" value={editForm.titre} onChange={e => setEditForm({...editForm, titre: e.target.value})} style={{width:'100%',padding:8}} required />
-                        </label>
-                      </div>
-                      <div style={{marginBottom:10}}>
-                        <label>Description<br/>
-                          <textarea name="description" value={editForm.description} onChange={e => setEditForm({...editForm, description: e.target.value})} style={{width:'100%',padding:8}} />
-                        </label>
-                      </div>
-                      <div style={{marginBottom:10,display:'flex',gap:10}}>
-                        <label style={{flex:1}}>Date début<br/>
-                          <input type="date" name="date_debut" value={editForm.date_debut} onChange={e => setEditForm({...editForm, date_debut: e.target.value})} style={{width:'100%',padding:8}} />
-                        </label>
-                        <label style={{flex:1}}>Date fin<br/>
-                          <input type="date" name="date_fin" value={editForm.date_fin} onChange={e => setEditForm({...editForm, date_fin: e.target.value})} style={{width:'100%',padding:8}} />
-                        </label>
-                      </div>
-                      <div style={{marginBottom:10}}>
-                        <label>Bannière (URL)<br/>
-                          <input type="text" name="banniere" value={editForm.banniere} onChange={e => setEditForm({...editForm, banniere: e.target.value})} style={{width:'100%',padding:8}} />
-                        </label>
-                      </div>
-                      {editError && <div style={{color:'red',marginBottom:10}}>{editError}</div>}
-                      {editSuccess && <div style={{color:'green',marginBottom:10}}>{editSuccess}</div>}
-                      <button type="submit" style={{width:'100%',padding:10,background:'#2e8b57',color:'#fff',border:'none',borderRadius:5,fontWeight:600}}>
-                        Enregistrer
-                      </button>
-                      <button type="button" onClick={() => setEditJeu(null)} style={{width:'100%',padding:10,background:'#eee',color:'#2e8b57',border:'none',borderRadius:5,fontWeight:600,marginTop:8}}>
-                        Annuler
-                      </button>
-                    </form>
-                  ) : (
-                    <>
-                      <h4>{jeu.titre}</h4>
-                      {jeu.banniere && <img src={jeu.banniere} alt="bannière" style={{maxWidth:'100%',maxHeight:120,objectFit:'cover',marginBottom:10}} />}
-                      <p>{jeu.description}</p>
-                      <p><b>Du</b> {jeu.date_debut ? new Date(jeu.date_debut).toLocaleDateString() : 'N/A'} <b>au</b> {jeu.date_fin ? new Date(jeu.date_fin).toLocaleDateString() : 'N/A'}</p>
-                      <p><b>Âge minimum :</b> {jeu.age_minimum || 18} ans</p>
-                      
-                      {jeu.lots && jeu.lots.length > 0 && (
-                        <div style={{marginTop:10}}>
-                          <h5>Lots à gagner :</h5>
-                          <ul style={{listStyle:'none',padding:0}}>
-                            {jeu.lots.map((lot, index) => (
-                              <li key={index} style={{marginBottom:5}}>
-                                <b>{lot.rang}.</b> {lot.description} - {lot.valeur}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      <div style={{marginTop:15}}>
-                        <button onClick={() => handleEditJeu(jeu)} style={{marginRight:10,background:'#eee',color:'#2e8b57',border:'none',padding:'6px 16px',borderRadius:5,fontWeight:600}}>
-                          Modifier
-                        </button>
-                        <button onClick={() => handleDeleteJeu(jeu.id)} style={{marginRight:10,background:'#ffdddd',color:'#b22222',border:'none',padding:'6px 16px',borderRadius:5,fontWeight:600}}>
-                          Supprimer
-                        </button>
-                        <button onClick={() => handleShowParticipants(jeu.id)} style={{marginTop:10,background:'#2e8b57',color:'#fff',border:'none',padding:'6px 16px',borderRadius:5,fontWeight:600}}>
-                          Voir les participants
-                        </button>
-                      </div>
-                    </>
-                  )}
-                  {showParticipantsJeuId === jeu.id && (
-                    <div style={{marginTop:15}}>
-                      <h5>Participants</h5>
-                      {participantsLoading ? <p>Chargement...</p> : (
-                        participants.length === 0 ? <p>Aucun participant</p> : (
-                          <ul style={{padding:0}}>
-                            {participants.map(p => (
-                              <li key={p.id} style={{marginBottom:8,listStyle:'none',borderBottom:'1px solid #eee',paddingBottom:4}}>
-                                {p.prenom} {p.nom} - {p.email} {p.telephone && (<span>({p.telephone})</span>)}
-                                <br/>
-                                <span style={{fontSize:'0.9em',color:'#888'}}>
-                                  {p.genre && <span>{p.genre === 'M' ? 'Homme' : 'Femme'} - </span>}
-                                  {p.date_naissance && <span>{new Date().getFullYear() - new Date(p.date_naissance).getFullYear()} ans - </span>}
-                                  le {new Date(p.date_participation).toLocaleString()}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        )
-                      )}
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
-      )}
+      </aside>
+
+      {/* Contenu principal */}
+      <main className="admin-main">
+        {!isLogged ? (
+          <div className="login-container">
+            <div className="login-box">
+              <h2>Connexion Admin</h2>
+              <div className="form-group">
+                <label>Mot de passe</label>
+                <input
+                  type="password"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSubmit(e)}
+                />
+              </div>
+              <button
+                className="login-button"
+                onClick={handleSubmit}
+                disabled={loadingJeux}
+              >
+                {loadingJeux ? 'Connexion...' : 'Se connecter'}
+              </button>
+              {error && (
+                <div className="error-message">
+                  {error}
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <>
+            <header className="admin-header">
+              <h1>
+                {activeSection === 'dashboard' && 'Tableau de bord'}
+                {activeSection === 'jeux' && 'Jeux concours'}
+                {activeSection === 'participants' && 'Participants'}
+              </h1>
+              <button className="refresh-button" onClick={refreshStats}>
+                <i className="fas fa-sync-alt"></i>
+                Actualiser
+              </button>
+            </header>
+
+            {activeSection === 'dashboard' && (
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <h3>Total Participants</h3>
+                  <div className="stat-value">{stats.totalParticipants}</div>
+                </div>
+                <div className="stat-card">
+                  <h3>Jeux Actifs</h3>
+                  <div className="stat-value">{stats.jeux_actifs}</div>
+                </div>
+                <div className="stat-card">
+                  <h3>Participants Aujourd'hui</h3>
+                  <div className="stat-value">{stats.participants_aujourdhui}</div>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'jeux' && (
+              <div className="content-card">
+                <div className="card-header">
+                  <button className="add-button" onClick={() => setShowNewJeuForm(true)}>
+                    <i className="fas fa-plus"></i>
+                    Nouveau jeu concours
+                  </button>
+                </div>
+
+                {loadingJeux ? (
+                  <div className="loading-message">Chargement...</div>
+                ) : jeux.length === 0 ? (
+                  <div className="empty-message">Aucun jeu concours</div>
+                ) : (
+                  <div className="jeux-grid">
+                    {jeux.map(jeu => (
+                      <div key={jeu.id} className="jeu-card">
+                        <h3>{jeu.titre}</h3>
+                        <div className="jeu-info">
+                          <div>
+                            <i className="fas fa-calendar"></i>
+                            Du {new Date(jeu.date_debut).toLocaleDateString()} au {new Date(jeu.date_fin).toLocaleDateString()}
+                          </div>
+                          <div>
+                            <i className="fas fa-users"></i>
+                            {jeu.participants_count} participants
+                          </div>
+                        </div>
+                        <div className="jeu-actions">
+                          <button
+                            className="view-button"
+                            onClick={() => handleShowParticipants(jeu.id)}
+                          >
+                            Voir participants
+                          </button>
+                          <button
+                            className="delete-button"
+                            onClick={() => handleDeleteJeu(jeu.id)}
+                            disabled={deletingJeuId === jeu.id}
+                          >
+                            {deletingJeuId === jeu.id ? 'Suppression...' : 'Supprimer'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeSection === 'participants' && showParticipantsJeuId && (
+              <div className="content-card">
+                <div className="search-container">
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    placeholder="Rechercher par nom ou prénom..."
+                    className="search-input"
+                  />
+                </div>
+
+                {participantsLoading ? (
+                  <div className="loading-message">Chargement...</div>
+                ) : participants.length === 0 ? (
+                  <div className="empty-message">Aucun participant trouvé</div>
+                ) : (
+                  <div className="table-container">
+                    <table className="participants-table">
+                      <thead>
+                        <tr>
+                          <th>Nom</th>
+                          <th>Prénom</th>
+                          <th>Email</th>
+                          <th>Téléphone</th>
+                          <th>Genre</th>
+                          <th>Date de naissance</th>
+                          <th>Date participation</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {participants.map(p => (
+                          <tr key={p.id}>
+                            <td>{p.nom}</td>
+                            <td>{p.prenom}</td>
+                            <td>{p.email}</td>
+                            <td>{p.telephone}</td>
+                            <td>{p.genre === 'M' ? 'Homme' : 'Femme'}</td>
+                            <td>{new Date(p.date_naissance).toLocaleDateString()}</td>
+                            <td>{new Date(p.date_participation).toLocaleDateString()}</td>
+                            <td>
+                              <button
+                                className="delete-button"
+                                onClick={() => handleDeleteParticipant(p.id)}
+                                disabled={deletingParticipant === p.id}
+                              >
+                                {deletingParticipant === p.id ? 'Suppression...' : 'Supprimer'}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </main>
     </div>
   );
 }
