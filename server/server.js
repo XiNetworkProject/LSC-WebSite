@@ -36,6 +36,7 @@ const RECAPTCHA_SECRET = '6Le5JkUrAAAAAPUTbm2QtQKWwbPW7r0Us7us51qu'; // À rempl
 
 // Mot de passe admin (à personnaliser si besoin)
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+console.log('ADMIN_PASSWORD configuré:', ADMIN_PASSWORD ? 'Oui' : 'Non');
 if (!ADMIN_PASSWORD) {
   console.error('ERREUR: ADMIN_PASSWORD n\'est pas défini dans les variables d\'environnement');
   process.exit(1);

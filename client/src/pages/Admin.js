@@ -106,14 +106,14 @@ function Admin() {
     fetch(`${config.apiUrl}/api/admin/jeux`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...addForm, password: password })
+      body: JSON.stringify({ ...addForm, password: sessionPassword })
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           setAddSuccess('Jeu ajouté !');
           setAddForm({ titre: '', description: '', date_debut: '', date_fin: '', banniere: '', lots: [{ rang: 1, description: '', valeur: '' }], age_minimum: 18 });
-          fetchJeux(password);
+          fetchJeux(sessionPassword);
         } else {
           setAddError(data.error || 'Erreur lors de l\'ajout');
         }
@@ -159,13 +159,13 @@ function Admin() {
     fetch(`${config.apiUrl}/api/admin/participants/delete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ participant_id, password: password })
+      body: JSON.stringify({ participant_id, password: sessionPassword })
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           fetchParticipants(showParticipantsJeuId);
-          refreshStats(password);
+          refreshStats(sessionPassword);
         }
         setDeletingParticipant(null);
       })
@@ -188,13 +188,13 @@ function Admin() {
     fetch(`${config.apiUrl}/api/admin/jeux/delete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jeu_id, password: password })
+      body: JSON.stringify({ jeu_id, password: sessionPassword })
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           fetchJeux();
-          refreshStats(password);
+          refreshStats(sessionPassword);
         }
         setDeletingJeuId(null);
       })
@@ -230,14 +230,14 @@ function Admin() {
     fetch(`${config.apiUrl}/api/admin/jeux/edit`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...editForm, password: password })
+      body: JSON.stringify({ ...editForm, password: sessionPassword })
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           setEditSuccess('Jeu modifié !');
           setEditJeu(null);
-          fetchJeux(password);
+          fetchJeux(sessionPassword);
         } else {
           setEditError(data.error || 'Erreur lors de la modification');
         }
@@ -317,10 +317,11 @@ function Admin() {
   };
 
   const refreshStats = (pwd) => {
+    const currentPassword = pwd || sessionPassword;
     fetch(`${config.apiUrl}/api/admin/stats`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pwd })
+      body: JSON.stringify({ password: currentPassword })
     })
       .then(res => res.json())
       .then(data => {
@@ -428,7 +429,7 @@ function Admin() {
                 {activeSection === 'jeux' && 'Jeux concours'}
                 {activeSection === 'participants' && 'Participants'}
               </h1>
-              <button className="refresh-button" onClick={() => refreshStats(password)}>
+              <button className="refresh-button" onClick={() => refreshStats(sessionPassword)}>
                 <i className="fas fa-sync-alt"></i>
                 Actualiser
               </button>
